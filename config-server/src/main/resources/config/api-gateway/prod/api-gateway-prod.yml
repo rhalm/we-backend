@@ -1,0 +1,17 @@
+zuul:
+  sensitiveHeaders: Cookie,Set-Cookie
+  routes:
+    feed:
+      path: /feed/**
+      url: http://feed-service:8080
+    messaging:
+      path: /messaging/**
+      url: http://messaging-service:8080
+    profile:
+      path: /profile/**
+      url: http://profile-service:8080
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB

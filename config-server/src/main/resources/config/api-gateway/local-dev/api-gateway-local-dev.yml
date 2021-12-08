@@ -1,0 +1,17 @@
+zuul:
+  sensitiveHeaders: Cookie,Set-Cookie
+  routes:
+    feed:
+      path: /feed/**
+      url: http://localhost:8081
+    messaging:
+      path: /messaging/**
+      url: http://localhost:8082
+    profile:
+      path: /profile/**
+      url: http://localhost:8083
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB

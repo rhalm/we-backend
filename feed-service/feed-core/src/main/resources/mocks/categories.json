@@ -1,0 +1,34 @@
+[
+  {
+    "id":0,
+    "name":"Storage"
+  },
+  {
+    "id":1,
+    "name":"Clothing"
+  },
+  {
+    "id":2,
+    "name":"Electronics"
+  },
+  {
+    "id":3,
+    "name":"Furniture"
+  },
+  {
+    "id":4,
+    "name":"Sports"
+  },
+  {
+    "id":5,
+    "name":"Creative purposes"
+  },
+  {
+    "id":6,
+    "name":"Beauty"
+  },
+  {
+    "id":7,
+    "name":"Other"
+  }
+]

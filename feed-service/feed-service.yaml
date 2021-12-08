@@ -1,0 +1,273 @@
+openapi: "3.0.0"
+info:
+  version: 0.0.1
+  title: feed-service
+
+paths:
+  /feed:
+    get:
+      summary: Get all ads with given parameters
+      operationId: getAds
+      parameters:
+        - name: location
+          in: query
+          description: Searched locations
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: category
+          in: query
+          description: Searched categories
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: withImageOnly
+          in: query
+          description: Only list ads that have images, default is false
+          required: false
+          schema:
+            type: boolean
+        - name: userId
+          in: query
+          description: Only list ads that belong to the given userId
+          required: false
+          schema:
+            type: string
+
+        - name: perPage
+          in: query
+          description: How many items are on a page
+          required: false
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Which page to return
+          required: false
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: An array of ads
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ads"
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      summary: Create a new ad
+      operationId: addAd
+      requestBody:
+        required: true
+        description: Ad details
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdCreateParam"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/FormData"
+
+      responses:
+        '201':
+          description: Ad created
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /feed/{adId}:
+    get:
+      summary: Get ad with given id
+      operationId: getAd
+      parameters:
+        - name: adId
+          in: path
+          description: ID of the ad
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Returned ad details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ad"
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    put:
+      summary: Update ad with given id
+      operationId: updateAd
+      parameters:
+        - name: adId
+          in: path
+          description: ID of the ad
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: Details to be updated
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdUpdateParam"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/FormData"
+
+      responses:
+        '200':
+          description: Ad updated
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      summary: Delete ad with given id
+      operationId: deleteAd
+      parameters:
+        - name: adId
+          in: path
+          description: ID of the ad
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Ad deleted
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Ad:
+      type: object
+      required:
+        - id
+        - userId
+        - title
+        - location
+        - category
+        - createdAt
+      properties:
+        id:
+          description: Identifier of the ad
+          type: string
+        userId:
+          description: Uploader's userID
+          type: string
+        title:
+          description: The title of the ad
+          type: string
+        location:
+          description: The location of the ad
+          type: string
+        category:
+          description: The category of the ad
+          type: string
+        description:
+          description: The description of the ad
+          type: string
+        images:
+          description: The uploaded images' urls
+          type: string
+        createdAt:
+          description: UTC timestamp of the creation of the ad
+          type: string
+          format: date-time
+
+    Ads:
+      type: array
+      items:
+        $ref: "#/components/schemas/Ad"
+
+    AdCreateParam:
+      type: object
+      required:
+        - title
+        - location
+        - category
+      properties:
+        title:
+          description: The title of the ad
+          type: string
+        location:
+          description: The location of the ad
+          type: string
+        category:
+          description: The category of the ad
+          type: string
+        description:
+          description: The description of the ad
+          type: string
+
+    AdUpdateParam:
+      type: object
+      properties:
+        title:
+          description: The title of the ad
+          type: string
+        location:
+          description: The location of the ad
+          type: string
+        category:
+          description: The category of the ad
+          type: string
+        description:
+          description: The description of the ad
+          type: string
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+
+    FormData:
+      type: object
+      required:
+        - asset
+      properties:
+        asset:
+          type: string
+          format: binary
+          

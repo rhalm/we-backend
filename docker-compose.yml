@@ -1,0 +1,83 @@
+version: "3.9"
+services:
+  config-server:
+    image: we-config-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod, native
+
+  api-gateway:
+    image: we-api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - config-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+
+  feed-service:
+    image: we-feed-service
+    depends_on:
+      - config-server
+      - feed-db
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+
+  messaging-service:
+    image: we-messaging-service
+    depends_on:
+      - config-server
+      - messaging-db
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+
+  profile-service:
+    image: we-profile-service
+    depends_on:
+      - config-server
+      - profile-db
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+
+  feed-db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=feeddb
+      - POSTGRES_USER=feeddbuser
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - feed-data:/var/lib/postgresql/data
+
+  messaging-db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=messagingdb
+      - POSTGRES_USER=messagingdbuser
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - messaging-data:/var/lib/postgresql/data
+
+  profile-db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=profiledb
+      - POSTGRES_USER=profiledbuser
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - profile-data:/var/lib/postgresql/data
+
+  frontend:
+    image: we-frontend
+    restart: always
+    depends_on:
+      - api-gateway
+    ports:
+      - 8000:80
+
+volumes:
+  feed-data:
+  messaging-data:
+  profile-data:

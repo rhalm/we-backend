@@ -1,0 +1,212 @@
+openapi: "3.0.0"
+info:
+  version: 0.0.1
+  title: profile-service
+
+paths:
+  /profiles:
+    get:
+      summary: Get profiles with given parameters
+      operationId: getProfiley
+      parameters:
+        - name: userId
+          in: query
+          description: Requested profile's userId
+          required: false
+          schema:
+            type: string
+
+        - name: searchTerm
+          in: query
+          description: String to search for in usernames
+          required: false
+          schema:
+            type: string
+
+        - name: perPage
+          in: query
+          description: How many items are on a page
+          required: false
+          schema:
+            type: integer
+
+        - name: page
+          in: query
+          description: Which page to return
+          required: false
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: An array of profiles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profiles"
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      summary: Create new profile
+      operationId: addProfile
+
+      requestBody:
+        required: false
+        description: Profile picture
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileCreateParam"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/FormData"
+
+      responses:
+        '201':
+          description: Profile created
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    put:
+      summary: Update profile that belongs to the user
+      operationId: updateProfile
+      parameters:
+        - name: introduction
+          in: query
+          description: Introduction
+          required: false
+          schema:
+            type: string
+
+      requestBody:
+        required: false
+        description: Profile picture
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/FormData"
+
+      responses:
+        '200':
+          description: Profile was updated
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+    delete:
+      summary: Delete profile that belongs to the user
+      operationId: deleteProfile
+
+      responses:
+        '200':
+          description: Profile was deleted
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /profiles/{id}:
+    get:
+      summary: Get profile with given id
+      operationId: getProfileById
+
+      parameters:
+        - name: id
+          in: path
+          description: Profile id
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Profile sent back
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+components:
+  schemas:
+    Profile:
+      type: object
+      required:
+        - id
+        - username
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+          description: The username of the profile
+        introduction:
+          description: Introduction message from the user
+          type: string
+        image:
+          description: Profile picture url
+          type: string
+
+    Profiles:
+      type: array
+      items:
+        $ref: "#/components/schemas/Profile"
+
+    ProfileCreateParam:
+      type: object
+      required:
+        - username
+      properties:
+        username:
+          type: string
+          description: The username of the profile
+        introduction:
+          description: Introduction message from the user
+          type: string
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+
+    FormData:
+      type: object
+      required:
+        - asset
+      properties:
+        asset:
+          type: string
+          format: binary
+          

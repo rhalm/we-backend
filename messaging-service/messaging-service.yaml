@@ -1,0 +1,231 @@
+openapi: "3.0.0"
+info:
+  version: 0.0.1
+  title: messaging-service
+
+paths:
+  /conversations:
+    get:
+      summary: Get all conversations that belong to the authenticated user
+      operationId: getConversations
+      parameters:
+        - name: perPage
+          in: query
+          description: How many items are on a page
+          required: false
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Which page to return
+          required: false
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: An array of conversations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversations"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      summary: Start a new conversation
+      operationId: addConversation
+      requestBody:
+        required: true
+        description: Conversation details
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConversationCreateParam"
+
+      responses:
+        '201':
+          description: Conversation was created
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /conversations/{conversationId}/messages:
+    get:
+      summary: Get all messages with given conversation ID
+      operationId: getMessages
+      parameters:
+        - name: conversationId
+          in: path
+          description: Id of the conversation
+          required: true
+          schema:
+            type: string
+
+        - name: perPage
+          in: query
+          description: How many items are on a page
+          required: false
+          schema:
+            type: integer
+
+        - name: page
+          in: query
+          description: Which page to return
+          required: false
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: An array of messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Messages"
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      summary: Send a new message
+      operationId: addMessage
+      parameters:
+        - name: conversationId
+          in: path
+          description: The ID of the conversation
+          required: true
+          schema:
+            type: string
+
+        - name: content
+          in: query
+          description: The content of the message
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '201':
+          description: Message sent
+
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Conversation:
+      type: object
+      required:
+        - id
+        - participants
+        - isRead
+        - title
+        - modifiedAt
+        - createdAt
+        - preview
+      properties:
+        id:
+          type: string
+        participants:
+          type: array
+          description: An array of userIds that are participants of the conversation
+          items:
+            type: string
+        isRead:
+          type: boolean
+          description: Whether or not the user has read the conversation
+        title:
+          description: The title of the conversation
+          type: string
+        modifiedAt:
+          description: UTC timestamp of the last sent message
+          type: string
+          format: date-time
+        createdAt:
+          description: UTC timestamp of the creation of the conversation
+          type: string
+          format: date-time
+        preview:
+          description: The first few characters of the last sent message
+          type: string
+
+    Conversations:
+      type: array
+      items:
+        $ref: "#/components/schemas/Conversation"
+
+    ConversationCreateParam:
+      type: object
+      required:
+        - receiverId
+        - title
+        - firstMessage
+      properties:
+        receiverId:
+          type: string
+          description: userId of the receiver of the first message, the other participant of the conversation
+        title:
+          description: The title of the conversation
+          type: string
+        firstMessage:
+          description: The first message sent in the conversation
+          type: string
+
+
+    Message:
+      type: object
+      required:
+        - id
+        - conversationId
+        - senderId
+        - content
+        - timestamp
+      properties:
+        id:
+          type: string
+        conversationId:
+          type: string
+          description: Id of the conversation it belongs to
+        senderId:
+          type: string
+          description: Sender's userId
+        content:
+          type: string
+          description: The content of the message
+        timestamp:
+          type: string
+          format: date-time
+          description: UTC timestamp of when the message was sent
+
+    Messages:
+      type: array
+      items:
+        $ref: "#/components/schemas/Message"
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+          

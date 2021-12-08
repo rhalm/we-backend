@@ -1,0 +1,13 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
+  datasource:
+    url: jdbc:h2:mem:.
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+server:
+  port: 8083
