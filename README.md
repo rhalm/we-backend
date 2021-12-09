@@ -28,7 +28,7 @@ Make sure your Docker is running and you have Docker Compose installed
 Create images for backend components:
 
 - Build project by running `mvn clean install`
-- Run `jib:dockerBuild` for all services in their folder (for Feed, Messaging and Profile in the \*-core folder)
+- Run `mvn jib:dockerBuild` for all services in their folder (for Feed, Messaging and Profile in the \*-core folder)
 
 Create image for frontend:
 
